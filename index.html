@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lanshi 视频商店预览</title>
+    <meta name="description" content="本地视频素材静态预览页">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">LS</span>
+          <div>
+            <h1>Lanshi 视频商店</h1>
+            <p>静态预览版：双击打开，微信支付流程为前端演示</p>
+          </div>
+        </div>
+        <div class="stats" aria-live="polite">
+          <span id="videoCount">读取素材中</span>
+          <span id="unlockCount">0 已解锁</span>
+        </div>
+      </header>
+
+      <main class="layout">
+        <aside class="filters" aria-label="筛选">
+          <label class="field">
+            <span>搜索</span>
+            <input id="searchInput" type="search" placeholder="输入片名或系列">
+          </label>
+
+          <label class="field">
+            <span>系列</span>
+            <select id="seriesFilter">
+              <option value="">全部系列</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>排序</span>
+            <select id="sortSelect">
+              <option value="title">按片名</option>
+              <option value="newest">最新更新</option>
+              <option value="priceHigh">价格从高到低</option>
+              <option value="sizeHigh">文件从大到小</option>
+            </select>
+          </label>
+
+          <div class="notice">
+            <strong>静态预览说明</strong>
+            <p id="paymentNotice">这里会模拟微信扫码支付。正式收款、订单校验和视频防盗链需要上线服务端后接入。</p>
+          </div>
+        </aside>
+
+        <section class="catalog-panel" aria-label="视频列表">
+          <div class="catalog-header">
+            <div>
+              <h2>全部视频</h2>
+              <p id="resultSummary">正在整理素材库</p>
+            </div>
+            <button id="resetButton" class="ghost-button" type="button">清除本机解锁记录</button>
+          </div>
+
+          <div id="catalogGrid" class="catalog-grid"></div>
+          <button id="loadMoreButton" class="load-more" type="button" hidden>加载更多</button>
+        </section>
+      </main>
+    </div>
+
+    <div id="ageGate" class="overlay" role="dialog" aria-modal="true" aria-labelledby="ageTitle">
+      <div class="dialog compact">
+        <h2 id="ageTitle">内容访问确认</h2>
+        <p>该页面用于本地视频素材售卖预览。请确认你已年满 18 岁，并拥有展示、销售这些素材的合法权利。</p>
+        <button id="ageConfirm" class="primary-button" type="button">我确认并进入</button>
+      </div>
+    </div>
+
+    <div id="paymentModal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="paymentTitle" hidden>
+      <div class="dialog payment-dialog">
+        <button class="close-button" type="button" data-close="paymentModal" aria-label="关闭">×</button>
+        <div class="dialog-heading">
+          <span class="status-pill">微信支付</span>
+          <h2 id="paymentTitle">解锁视频</h2>
+          <p id="paymentSubtitle"></p>
+        </div>
+        <div class="payment-body">
+          <canvas id="qrCanvas" width="180" height="180" aria-label="微信支付二维码"></canvas>
+          <div>
+            <p class="amount" id="paymentAmount">¥0.00</p>
+            <p class="muted">静态预览会生成模拟二维码。真实网站这里会显示微信 Native 支付二维码。</p>
+            <button id="mockPaidButton" class="primary-button" type="button">我已完成支付</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="playerModal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="playerTitle" hidden>
+      <div class="dialog player-dialog">
+        <button class="close-button" type="button" data-close="playerModal" aria-label="关闭">×</button>
+        <h2 id="playerTitle">播放视频</h2>
+        <p id="playerHint" class="muted"></p>
+        <video id="videoPlayer" controls playsinline></video>
+      </div>
+    </div>
+
+    <template id="cardTemplate">
+      <article class="video-card">
+        <div class="thumb-wrap">
+          <img class="thumb" alt="" loading="lazy">
+          <div class="thumb-fallback"></div>
+          <span class="lock-badge">未解锁</span>
+        </div>
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="series"></span>
+            <span class="size"></span>
+          </div>
+          <h3></h3>
+          <div class="card-footer">
+            <span class="price"></span>
+            <button class="primary-button card-action" type="button"></button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="./catalog.js"></script>
+    <script src="./app-static.js"></script>
+  </body>
+</html>
