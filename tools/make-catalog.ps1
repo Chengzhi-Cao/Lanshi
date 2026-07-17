@@ -21,6 +21,7 @@ $SeriesPatterns = @(
   "TeenBat",
   "TeenWing",
   "Sexy Spies",
+  "Scotland Yard",
   "SYCC",
   "UKSG",
   "Athena",

@@ -150,6 +150,11 @@ select:focus {
   border: 1px solid rgba(74, 176, 161, 0.35);
 }
 
+.notice.subtle {
+  background: rgba(215, 167, 79, 0.08);
+  border-color: rgba(215, 167, 79, 0.32);
+}
+
 .notice strong {
   display: block;
   margin-bottom: 8px;
@@ -394,10 +399,31 @@ select:focus {
   margin-top: 20px;
 }
 
+.pay-code-frame {
+  width: 180px;
+  height: 180px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
 #qrCanvas {
   width: 180px;
   height: 180px;
   background: #fff;
+}
+
+.pay-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.pay-image[hidden],
+#qrCanvas[hidden] {
+  display: none;
 }
 
 .amount {
@@ -407,8 +433,22 @@ select:focus {
   font-weight: 900;
 }
 
-.payment-body .primary-button {
+.payment-body .primary-button,
+.payment-body .ghost-button {
   margin-top: 18px;
+}
+
+.payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.order-status {
+  margin-top: 12px;
+  color: var(--teal);
+  font-weight: 700;
 }
 
 .player-dialog {
@@ -431,6 +471,65 @@ select:focus {
   border: 1px solid var(--line);
 }
 
+.admin-shell {
+  min-height: 100vh;
+}
+
+.admin-layout {
+  padding: 24px;
+}
+
+.admin-panel {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.admin-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 360px) minmax(180px, 240px);
+  gap: 16px;
+  margin: 18px 0 20px;
+}
+
+.admin-orders {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-order {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 16px;
+  background: #0f1419;
+  border: 1px solid var(--line);
+}
+
+.admin-order h3 {
+  margin: 8px 0 6px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.admin-order-side {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-order.is-paid {
+  opacity: 0.78;
+}
+
+.order-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
 @media (max-width: 860px) {
   .topbar,
   .catalog-header,
@@ -450,6 +549,16 @@ select:focus {
 
   .payment-body {
     grid-template-columns: 1fr;
+  }
+
+  .admin-controls,
+  .admin-order {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-order-side {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 }
 

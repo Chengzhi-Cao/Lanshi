@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lanshi 视频商店预览</title>
-    <meta name="description" content="本地视频素材静态预览页">
-    <link rel="stylesheet" href="./styles.css">
+    <title>Lanshi 视频商店</title>
+    <meta name="description" content="单个视频微信扫码购买，付款后下载">
+    <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
     <div class="app-shell">
@@ -14,12 +14,12 @@
           <span class="brand-mark">LS</span>
           <div>
             <h1>Lanshi 视频商店</h1>
-            <p>静态预览版：双击打开，微信支付流程为前端演示</p>
+            <p>每个视频 5 元，微信扫码购买后下载</p>
           </div>
         </div>
         <div class="stats" aria-live="polite">
           <span id="videoCount">读取素材中</span>
-          <span id="unlockCount">0 已解锁</span>
+          <span id="purchaseCount">0 已购买</span>
         </div>
       </header>
 
@@ -42,14 +42,18 @@
             <select id="sortSelect">
               <option value="title">按片名</option>
               <option value="newest">最新更新</option>
-              <option value="priceHigh">价格从高到低</option>
               <option value="sizeHigh">文件从大到小</option>
             </select>
           </label>
 
           <div class="notice">
-            <strong>静态预览说明</strong>
-            <p id="paymentNotice">这里会模拟微信扫码支付。正式收款、订单校验和视频防盗链需要上线服务端后接入。</p>
+            <strong>购买规则</strong>
+            <p>单个视频统一 5 元。付款成功后，当前浏览器会获得下载权限。</p>
+          </div>
+
+          <div class="notice subtle">
+            <strong>本地说明</strong>
+          <p id="paymentNotice">本地默认使用 pay.jpg 作为微信收款码。付款后在卖家后台确认收款，即可开放下载。</p>
           </div>
         </aside>
 
@@ -59,7 +63,7 @@
               <h2>全部视频</h2>
               <p id="resultSummary">正在整理素材库</p>
             </div>
-            <button id="resetButton" class="ghost-button" type="button">清除本机解锁记录</button>
+            <button id="refreshButton" class="ghost-button" type="button">刷新素材</button>
           </div>
 
           <div id="catalogGrid" class="catalog-grid"></div>
@@ -71,7 +75,7 @@
     <div id="ageGate" class="overlay" role="dialog" aria-modal="true" aria-labelledby="ageTitle">
       <div class="dialog compact">
         <h2 id="ageTitle">内容访问确认</h2>
-        <p>该页面用于本地视频素材售卖预览。请确认你已年满 18 岁，并拥有展示、销售这些素材的合法权利。</p>
+        <p>请确认你已年满 18 岁，并拥有展示、销售这些视频素材的合法权利。</p>
         <button id="ageConfirm" class="primary-button" type="button">我确认并进入</button>
       </div>
     </div>
@@ -80,27 +84,25 @@
       <div class="dialog payment-dialog">
         <button class="close-button" type="button" data-close="paymentModal" aria-label="关闭">×</button>
         <div class="dialog-heading">
-          <span class="status-pill">微信支付</span>
-          <h2 id="paymentTitle">解锁视频</h2>
+          <span class="status-pill">微信扫码支付</span>
+          <h2 id="paymentTitle">购买视频</h2>
           <p id="paymentSubtitle"></p>
         </div>
         <div class="payment-body">
-          <canvas id="qrCanvas" width="180" height="180" aria-label="微信支付二维码"></canvas>
+          <div class="pay-code-frame">
+            <img id="payImage" class="pay-image" alt="微信收款码" hidden>
+            <canvas id="qrCanvas" width="220" height="220" aria-label="微信支付二维码"></canvas>
+          </div>
           <div>
-            <p class="amount" id="paymentAmount">¥0.00</p>
-            <p class="muted">静态预览会生成模拟二维码。真实网站这里会显示微信 Native 支付二维码。</p>
-            <button id="mockPaidButton" class="primary-button" type="button">我已完成支付</button>
+            <p class="amount" id="paymentAmount">¥5.00</p>
+            <p class="muted" id="paymentHelp">请使用微信扫码支付。付款成功后，下载按钮会自动出现。</p>
+            <p class="order-status" id="orderStatus">等待创建订单</p>
+            <div class="payment-actions">
+              <button id="mockPaidButton" class="primary-button" type="button" hidden>本机确认已收款</button>
+              <button id="downloadAfterPayButton" class="ghost-button" type="button" hidden>下载视频</button>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div id="playerModal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="playerTitle" hidden>
-      <div class="dialog player-dialog">
-        <button class="close-button" type="button" data-close="playerModal" aria-label="关闭">×</button>
-        <h2 id="playerTitle">播放视频</h2>
-        <p id="playerHint" class="muted"></p>
-        <video id="videoPlayer" controls playsinline></video>
       </div>
     </div>
 
@@ -109,7 +111,7 @@
         <div class="thumb-wrap">
           <img class="thumb" alt="" loading="lazy">
           <div class="thumb-fallback"></div>
-          <span class="lock-badge">未解锁</span>
+          <span class="lock-badge">未购买</span>
         </div>
         <div class="card-body">
           <div class="card-meta">
@@ -118,14 +120,14 @@
           </div>
           <h3></h3>
           <div class="card-footer">
-            <span class="price"></span>
+            <span class="price">¥5.00</span>
             <button class="primary-button card-action" type="button"></button>
           </div>
         </div>
       </article>
     </template>
 
-    <script src="./catalog.js"></script>
-    <script src="./app-static.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="/app.js"></script>
   </body>
 </html>
