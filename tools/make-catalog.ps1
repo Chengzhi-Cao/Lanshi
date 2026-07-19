@@ -71,9 +71,7 @@ function Get-SizeLabel([int64]$Size) {
 }
 
 function Get-PriceCents([int64]$Size) {
-  if ($Size -ge 900MB) { return 3990 }
-  if ($Size -ge 350MB) { return 2990 }
-  return 1990
+  return 100
 }
 
 $videos = Get-ChildItem -LiteralPath $MediaRoot -File |
@@ -90,7 +88,7 @@ $videos = Get-ChildItem -LiteralPath $MediaRoot -File |
       size = $_.Length
       sizeLabel = Get-SizeLabel $_.Length
       priceCents = $price
-      priceLabel = "¥{0:N2}" -f ($price / 100)
+      priceLabel = ("{0}{1:N2}" -f [char]0x00A5, ($price / 100))
       updatedAt = [int64]([DateTimeOffset]$_.LastWriteTime).ToUnixTimeSeconds()
       thumb = "./thumbs/$id.jpg"
       ext = $_.Extension.ToLower()

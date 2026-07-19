@@ -33,6 +33,11 @@ const elements = {
   downloadAfterPayButton: document.querySelector("#downloadAfterPayButton"),
   payImage: document.querySelector("#payImage"),
   qrCanvas: document.querySelector("#qrCanvas"),
+  previewModal: document.querySelector("#previewModal"),
+  previewTitle: document.querySelector("#previewTitle"),
+  previewMeta: document.querySelector("#previewMeta"),
+  previewImage: document.querySelector("#previewImage"),
+  previewBuyButton: document.querySelector("#previewBuyButton"),
 };
 
 function formatDate(timestamp) {
@@ -110,6 +115,7 @@ function renderCatalog() {
     const series = fragment.querySelector(".series");
     const size = fragment.querySelector(".size");
     const price = fragment.querySelector(".price");
+    const previewAction = fragment.querySelector(".preview-action");
     const action = fragment.querySelector(".card-action");
 
     card.classList.toggle("unlocked", video.purchased);
@@ -122,7 +128,16 @@ function renderCatalog() {
     series.textContent = video.series;
     size.textContent = `${video.sizeLabel} · ${formatDate(video.updatedAt)}`;
     price.textContent = video.priceLabel;
-    action.textContent = video.purchased ? "下载视频" : "微信购买";
+    previewAction.addEventListener("click", () => openPreview(video));
+    image.addEventListener("click", () => openPreview(video));
+    image.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openPreview(video);
+      }
+    });
+    image.tabIndex = 0;
+    action.textContent = video.purchased ? "下载原视频" : "支付下载";
     action.addEventListener("click", () => {
       if (video.purchased) {
         downloadVideo(video);
@@ -145,7 +160,7 @@ async function loadConfig() {
   if (mode === "wechat" && state.config.wechatConfigured) {
     elements.paymentNotice.textContent = "已启用微信 Native 支付。付款成功依赖服务器回调确认。";
   } else if (mode === "manual" && state.config.manualPayReady) {
-    elements.paymentNotice.textContent = "当前使用 pay.jpg 作为微信收款码。用户扫码付款后，由卖家后台确认收款并开放下载。";
+    elements.paymentNotice.textContent = "当前使用 pay.jpg 作为微信收款码。用户扫码支付 1 元后，由卖家后台确认收款并开放下载。";
   } else {
     elements.paymentNotice.textContent = "当前为本地支付测试模式。放入 pay.jpg 可显示微信收款码，配置微信商户参数后可切换正式支付。";
   }
@@ -190,10 +205,11 @@ async function startPayment(video) {
 
   state.currentOrder = order;
   elements.paymentSubtitle.textContent = `订单号：${order.orderId}`;
+  elements.paymentAmount.textContent = order.amountLabel || video.priceLabel;
   elements.orderStatus.textContent = "等待微信扫码支付";
   elements.paymentHelp.textContent =
     order.paymentMode === "manual"
-      ? "请用微信扫码支付 5 元。付款备注可填写订单号，卖家确认收款后会自动解锁下载。"
+      ? `请用微信扫码支付 ${order.amountLabel || video.priceLabel}。付款备注可填写订单号，卖家确认收款后会自动解锁下载。`
       : order.paymentMode === "mock"
         ? "本地演示二维码不会真实扣款。点击“本机确认已收款”即可测试购买后下载。"
         : "请使用微信扫码支付，支付回调成功后会解锁下载。";
@@ -250,6 +266,27 @@ function downloadVideo(video) {
 function downloadCurrentVideo() {
   const video = state.videos.find((item) => state.currentVideo && item.id === state.currentVideo.id) || state.currentVideo;
   if (video) downloadVideo(video);
+}
+
+function openPreview(video) {
+  state.currentVideo = video;
+  elements.previewTitle.textContent = video.title;
+  elements.previewMeta.textContent = `${video.series} · ${video.sizeLabel} · 预览图免费查看`;
+  elements.previewImage.src = video.thumb;
+  elements.previewImage.alt = `${video.title} 免费预览图`;
+  elements.previewBuyButton.textContent = video.purchased ? "下载原视频" : `支付 ${video.priceLabel} 下载原视频`;
+  showModal(elements.previewModal);
+}
+
+function handlePreviewBuy() {
+  if (!state.currentVideo) return;
+  const video = state.videos.find((item) => item.id === state.currentVideo.id) || state.currentVideo;
+  closeModal(elements.previewModal);
+  if (video.purchased) {
+    downloadVideo(video);
+  } else {
+    startPayment(video);
+  }
 }
 
 async function drawQr(text) {
@@ -343,11 +380,15 @@ function setupEvents() {
   elements.refreshButton.addEventListener("click", refreshVideos);
   elements.mockPaidButton.addEventListener("click", confirmMockPayment);
   elements.downloadAfterPayButton.addEventListener("click", downloadCurrentVideo);
+  elements.previewBuyButton.addEventListener("click", handlePreviewBuy);
   document.querySelectorAll("[data-close]").forEach((button) => {
     button.addEventListener("click", () => closeModal(document.querySelector(`#${button.dataset.close}`)));
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeModal(elements.paymentModal);
+    if (event.key === "Escape") {
+      closeModal(elements.paymentModal);
+      closeModal(elements.previewModal);
+    }
   });
 }
 

@@ -20,6 +20,12 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except AttributeError:
+    pass
+
 
 SITE_DIR = Path(__file__).resolve().parent
 MEDIA_DIR = SITE_DIR.parent
@@ -29,7 +35,7 @@ DB_PATH = DATA_DIR / "lanshi_store.db"
 SESSION_COOKIE = "lanshi_session"
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".mkv", ".avi", ".wmv", ".mpg", ".mpeg"}
 
-PRICE_CENTS = 500
+PRICE_CENTS = 100
 PAYMENT_MODE = os.environ.get("WECHAT_PAY_MODE", "manual").lower()
 PAY_IMAGE_FILE = os.environ.get("WECHAT_PAY_IMAGE", "pay.jpg")
 ADMIN_TOKEN = os.environ.get("LANSHI_ADMIN_TOKEN", "lanshi-local-admin")
@@ -160,7 +166,7 @@ def init_db():
                 ext TEXT NOT NULL,
                 thumb TEXT NOT NULL,
                 active INTEGER NOT NULL DEFAULT 1,
-                price_cents INTEGER NOT NULL DEFAULT 500
+                price_cents INTEGER NOT NULL DEFAULT 100
             )
             """
         )
@@ -532,6 +538,9 @@ class StoreHandler(SimpleHTTPRequestHandler):
     def do_HEAD(self):
         parsed = urlparse(self.path)
         path = parsed.path
+        if path == "/pay.jpg":
+            self.handle_pay_image(head_only=True)
+            return
         if path.startswith("/api/videos/") and path.endswith("/download"):
             self.handle_download(path, head_only=True)
             return
@@ -745,7 +754,7 @@ class StoreHandler(SimpleHTTPRequestHandler):
         # Full WeChat v3 callback verification/decryption should be added before production.
         self.send_json({"code": "SUCCESS", "message": "stored"})
 
-    def handle_pay_image(self):
+    def handle_pay_image(self, head_only=False):
         image = payment_image_path()
         if not image:
             self.send_error(HTTPStatus.NOT_FOUND)
@@ -756,6 +765,8 @@ class StoreHandler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(image.stat().st_size))
         self.send_header("Cache-Control", "public, max-age=300")
         self.end_headers()
+        if head_only:
+            return
         with image.open("rb") as file:
             shutil.copyfileobj(file, self.wfile)
 

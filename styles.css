@@ -208,6 +208,12 @@ select:focus {
 .thumb {
   object-fit: cover;
   display: block;
+  cursor: zoom-in;
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
 }
 
 .thumb-fallback {
@@ -257,9 +263,10 @@ select:focus {
 .card-meta,
 .card-footer {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   gap: 10px;
+  flex-direction: column;
 }
 
 .card-meta {
@@ -288,6 +295,19 @@ select:focus {
 .price {
   font-weight: 800;
   color: var(--gold);
+}
+
+.card-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.card-actions .primary-button,
+.card-actions .ghost-button {
+  width: 100%;
+  min-width: 0;
+  padding: 0 10px;
 }
 
 .primary-button,
@@ -393,23 +413,23 @@ select:focus {
 
 .payment-body {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr);
+  grid-template-columns: 220px minmax(0, 1fr);
   gap: 24px;
   align-items: center;
   margin-top: 20px;
 }
 
 .pay-code-frame {
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  height: 220px;
   overflow: hidden;
   background: #fff;
   border: 1px solid var(--line);
 }
 
 #qrCanvas {
-  width: 180px;
-  height: 180px;
+  width: 220px;
+  height: 220px;
   background: #fff;
 }
 
@@ -449,6 +469,26 @@ select:focus {
   margin-top: 12px;
   color: var(--teal);
   font-weight: 700;
+}
+
+.preview-dialog {
+  width: min(920px, 100%);
+}
+
+.preview-image {
+  display: block;
+  width: 100%;
+  max-height: min(62vh, 560px);
+  margin-top: 18px;
+  object-fit: contain;
+  background: #0b0b0c;
+  border: 1px solid var(--line);
+}
+
+.preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
 }
 
 .player-dialog {

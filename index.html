@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lanshi 视频商店</title>
-    <meta name="description" content="单个视频微信扫码购买，付款后下载">
+    <title>Lanshi 影像小店</title>
+    <meta name="description" content="免费视频预览图，原视频 1 元微信扫码购买后下载">
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
@@ -13,8 +13,8 @@
         <div class="brand">
           <span class="brand-mark">LS</span>
           <div>
-            <h1>Lanshi 视频商店</h1>
-            <p>每个视频 5 元，微信扫码购买后下载</p>
+            <h1>Lanshi 影像小店</h1>
+            <p>预览图免费查看，原视频 1 元微信扫码下载</p>
           </div>
         </div>
         <div class="stats" aria-live="polite">
@@ -48,7 +48,7 @@
 
           <div class="notice">
             <strong>购买规则</strong>
-            <p>单个视频统一 5 元。付款成功后，当前浏览器会获得下载权限。</p>
+            <p>所有预览图都可以免费查看。下载原视频需要支付 1 元，付款确认后当前浏览器会获得下载权限。</p>
           </div>
 
           <div class="notice subtle">
@@ -84,7 +84,7 @@
       <div class="dialog payment-dialog">
         <button class="close-button" type="button" data-close="paymentModal" aria-label="关闭">×</button>
         <div class="dialog-heading">
-          <span class="status-pill">微信扫码支付</span>
+          <span class="status-pill">微信扫码支付 1 元</span>
           <h2 id="paymentTitle">购买视频</h2>
           <p id="paymentSubtitle"></p>
         </div>
@@ -94,14 +94,29 @@
             <canvas id="qrCanvas" width="220" height="220" aria-label="微信支付二维码"></canvas>
           </div>
           <div>
-            <p class="amount" id="paymentAmount">¥5.00</p>
-            <p class="muted" id="paymentHelp">请使用微信扫码支付。付款成功后，下载按钮会自动出现。</p>
+            <p class="amount" id="paymentAmount">¥1.00</p>
+            <p class="muted" id="paymentHelp">请使用微信扫描收款码支付 1 元。付款确认后，下载按钮会自动出现。</p>
             <p class="order-status" id="orderStatus">等待创建订单</p>
             <div class="payment-actions">
               <button id="mockPaidButton" class="primary-button" type="button" hidden>本机确认已收款</button>
               <button id="downloadAfterPayButton" class="ghost-button" type="button" hidden>下载视频</button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="previewModal" class="overlay" role="dialog" aria-modal="true" aria-labelledby="previewTitle" hidden>
+      <div class="dialog preview-dialog">
+        <button class="close-button" type="button" data-close="previewModal" aria-label="关闭">×</button>
+        <div class="dialog-heading">
+          <span class="status-pill">免费预览</span>
+          <h2 id="previewTitle">预览图</h2>
+          <p id="previewMeta"></p>
+        </div>
+        <img id="previewImage" class="preview-image" alt="">
+        <div class="preview-actions">
+          <button id="previewBuyButton" class="primary-button" type="button">支付 1 元下载原视频</button>
         </div>
       </div>
     </div>
@@ -120,14 +135,16 @@
           </div>
           <h3></h3>
           <div class="card-footer">
-            <span class="price">¥5.00</span>
-            <button class="primary-button card-action" type="button"></button>
+            <span class="price">¥1.00</span>
+            <div class="card-actions">
+              <button class="ghost-button preview-action" type="button">查看预览</button>
+              <button class="primary-button card-action" type="button"></button>
+            </div>
           </div>
         </div>
       </article>
     </template>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>
